@@ -30,7 +30,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const file = Array.isArray(files.file) ? files.file[0] : files.file;
-    const stream = fs.createReadStream(file.filepath);
+     fs.createReadStream(file.filepath);
 
     cloudinary.uploader.upload_stream({ folder: 'juber' }, (error, result) => {
       if (error || !result) {
