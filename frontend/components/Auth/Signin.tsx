@@ -6,6 +6,9 @@ import { graphqlClient } from "@/client/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+type VerifyGoogleTokenResponse = {
+  verifyGoogleToken: string;
+};
 
 function Signin() {
   const router = useRouter();
@@ -23,7 +26,7 @@ function Signin() {
       return toast.error("There is some error try again ");
     }
     // console.log(googleToken)
-    const { verifyGoogleToken } = await graphqlClient.request(
+    const { verifyGoogleToken } = await graphqlClient.request<VerifyGoogleTokenResponse>(
       verifyUserGoogleTokenQuery,
       { token: googleToken }
     );
@@ -32,7 +35,7 @@ function Signin() {
     }
 
     toast.success("Welcome");
-    // console.log(verifyGoogleToken);
+    console.log(verifyGoogleToken);
     if (verifyGoogleToken) {
       window.localStorage.setItem("token", verifyGoogleToken);
 
