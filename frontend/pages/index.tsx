@@ -86,7 +86,7 @@ export default function Home(props:HomeProps) {
                   rows={3}
                   id=""
                 ></textarea>
-               {url&&<Image src={url} className=" rounded-sm min-h-0 max-h-60  max-w-60"  alt="" />}
+                {url&&<Image src={url} className=" rounded-sm min-h-0 max-h-60  max-w-60"  alt="" />}
                 <div className="mt-2 flex gap-6 items-center ">
                   <div className="text-center mt-4">
       <IoImageOutline
@@ -105,7 +105,7 @@ export default function Home(props:HomeProps) {
             </div>
           </div>
           {tweets?.map((tweet) =>
-            tweet ? <FeedCard key={tweet.id} data={tweet} /> : null
+            tweet ? <FeedCard key={tweet.id} data={tweet as Tweet} /> : null
           )}
         </div>
       </TweeterLayout>
