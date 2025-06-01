@@ -8,7 +8,7 @@ import { useCurrentUser } from "@/hooks/user";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 
-import { User } from "@/gql/graphql";
+// import { User } from "@/gql/graphql";
 import Signin from "@/components/Auth/Signin";
 
 interface ṬwitterlayoutProps {
@@ -124,7 +124,7 @@ const TweeterLayout: React.FC<ṬwitterlayoutProps> = (props) => {
               <h1 className="my-2 text-2xl mb-5">
                 Users you may also like to follow
               </h1>
-              {user?.recommendedUsers?.map((el: User) => (
+              {user?.recommendedUsers?.map((el) => (
                 <div
                   className="flex items-center gap-3 mt-2 rounded-2xl px-2.5 hover:bg-zinc-600 bg-zinc-900 p-2"
                   key={el?.id}
