@@ -23,6 +23,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   const router = useRouter();
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
+  document.title=`${user?.firstName} || Profile`
   // console.log(props)
   const amIFollowing = useMemo(() => {
     if (!props?.userInfo) return false;
