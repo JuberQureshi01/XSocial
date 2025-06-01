@@ -4,7 +4,7 @@ import type { GetServerSideProps, NextPage } from "next";
 import { BsArrowLeftShort } from "react-icons/bs";
 import Image from "next/image";
 import FeedCard from "@/components/FeedCard";
-import { User } from "@/gql/graphql";
+import { GetuserByIdQuery, User } from "@/gql/graphql";
 import { graphqlClient } from "@/client/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
 import { useRouter } from "next/router";
@@ -25,9 +25,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   const queryClient = useQueryClient();
   // console.log(props)
   const amIFollowing = useMemo(() => {
-    if (!props.userInfo) return false;
+    if (!props?.userInfo) return false;
     return (
-      (user?.following?.findIndex((el:User) => el?.id === props.userInfo?.id) ??
+      (user?.following?.findIndex((el) => el?.id === props?.userInfo?.id) ??
         -1) >= 0
     );
   }, [user?.following, props.userInfo]);
@@ -120,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!id) {
     return { notFound: true, props: { user: undefined } };
   }
-  const userInfo = await graphqlClient.request(getUserByIdQuery, { id });
+  const userInfo = await graphqlClient.request<GetuserByIdQuery>(getUserByIdQuery, { id });
   console.log("solve karo", userInfo);
   if (!userInfo?.getUserById) {
     return { notFound: true };
