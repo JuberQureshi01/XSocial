@@ -8,8 +8,11 @@ import { User } from "@/gql/graphql";
 import { graphqlClient } from "@/client/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
 import { useRouter } from "next/router";
-import {  useCallback, useMemo } from "react";
-import { followUserMutation, unfollowUserMutation } from "@/graphql/mutations/user";
+import { useCallback, useMemo } from "react";
+import {
+  followUserMutation,
+  unfollowUserMutation,
+} from "@/graphql/mutations/user";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface ServerProps {
@@ -21,12 +24,11 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
   // console.log(props)
- const amIFollowing = useMemo(() => {
+  const amIFollowing = useMemo(() => {
     if (!props.userInfo) return false;
     return (
-      (user?.following?.findIndex(
-        (el) => el?.id === props.userInfo?.id
-      ) ?? -1) >= 0
+      (user?.following?.findIndex((el:User) => el?.id === props.userInfo?.id) ??
+        -1) >= 0
     );
   }, [user?.following, props.userInfo]);
 
@@ -34,7 +36,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     if (!props.userInfo?.id) return;
 
     await graphqlClient.request(followUserMutation, { to: props.userInfo?.id });
-    await queryClient.invalidateQueries(["curent-user"]);
+    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
   }, [props.userInfo?.id, queryClient]);
 
   const handleUnfollowUser = useCallback(async () => {
@@ -43,7 +45,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     await graphqlClient.request(unfollowUserMutation, {
       to: props.userInfo?.id,
     });
-    await queryClient.invalidateQueries(["curent-user"]);
+   await queryClient.invalidateQueries({ queryKey: ["current-user"] });
   }, [props.userInfo?.id, queryClient]);
 
   return (
@@ -58,18 +60,18 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             <div>
               <h1 className="text-2xl font-bold">{`${props.userInfo?.firstName} ${props.userInfo?.lastName}`}</h1>
               <h1 className="text-md font-bold text-slate-500">
-                No. of Post is {props.userInfo?.tweets.length || 0}
+                No. of Post is {props.userInfo?.tweets?.length || 0}
               </h1>
             </div>
           </nav>
           <div className="p-4 border-b border-slate-600 ">
-            {user?.profileImageUrl && (
+            {props.userInfo?.profileImageUrl && (
               <Image
-                src={props.userInfo?.profileImageUrl}
+                src={props.userInfo.profileImageUrl}
                 alt="User-image"
                 width={100}
-                className="rounded-full"
                 height={100}
+                className="rounded-full"
               />
             )}
             <h1 className="text-2xl font-bold mt-5">
@@ -84,11 +86,17 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
               {user?.id != props.userInfo?.id && (
                 <>
                   {amIFollowing ? (
-                    <button onClick={handleUnfollowUser} className="bg-white text-black px-3 py-1 rounded-full ">
+                    <button
+                      onClick={handleUnfollowUser}
+                      className="bg-white text-black px-3 py-1 rounded-full "
+                    >
                       Unfollow
                     </button>
                   ) : (
-                    <button onClick={handleFollowUser} className="bg-white text-black px-3 py-1 rounded-full ">
+                    <button
+                      onClick={handleFollowUser}
+                      className="bg-white text-black px-3 py-1 rounded-full "
+                    >
                       Follow
                     </button>
                   )}
