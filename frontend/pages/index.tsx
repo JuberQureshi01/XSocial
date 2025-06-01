@@ -1,24 +1,24 @@
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import FeedCard from "@/components/FeedCard";
-import { useCreateTweet, useGetAllTweets,  } from "@/hooks/tweet";
+import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
 import TweeterLayout from "@/components/FeedCard/layout/TweeterLayout";
 import { GetServerSideProps } from "next";
 import { graphqlClient } from "@/client/api";
 import { getAllTweetQuery } from "@/graphql/query/tweet";
-import { Tweet } from "@/gql/graphql";
+import { GetAllTweetsQuery, Tweet } from "@/gql/graphql";
 import { IoImageOutline } from "react-icons/io5";
 import { useCurrentUser } from "@/hooks/user";
 
-interface HomeProps{
-  tweets?:Tweet
+interface HomeProps {
+  tweets?: Tweet;
 }
 
-export default function Home(props:HomeProps) {
+export default function Home(props: HomeProps) {
   const { mutate } = useCreateTweet();
   const [content, setContent] = useState("");
-  const {user}=useCurrentUser();
-  const {tweets =props?.tweets as Tweet[]}= useGetAllTweets();
+  const { user } = useCurrentUser();
+  const { tweets = props?.tweets } = useGetAllTweets();
   const [url, setUrl] = useState<string | null>(null);
 
   const handleUploadImage = () => {
@@ -31,10 +31,10 @@ export default function Home(props:HomeProps) {
       if (!file) return;
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
+      const res = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
@@ -46,16 +46,15 @@ export default function Home(props:HomeProps) {
     input.click();
   };
 
-
   const handleCreateTweet = useCallback(async () => {
     mutate({
       content,
-      imageURl:url
+      imageURl: url,
     });
 
     setContent("");
-    setUrl("")
-  }, [content, mutate,url]);
+    setUrl("");
+  }, [content, mutate, url]);
 
   return (
     <div>
@@ -64,17 +63,15 @@ export default function Home(props:HomeProps) {
           <div className="border-t-[0.5px] border-zinc-700 p-5  w-fit flex flex-wrap overflow-x-hidden">
             <div className="grid grid-cols-12 gap-2 ">
               <div className="col-span-1">
-                <Image
-                  src={
-                    user
-                      ? user.profileImageUrl
-                      : "https://i.pinimg.com/736x/09/21/fc/0921fc87aa989330b8d403014bf4f340.jpg"
-                  }
-                  alt="user-image"
-                  className="rounded-full"
-                  height={50}
-                  width={50}
-                />
+                {user?.profileImageUrl && (
+                  <Image
+                    src={user?.profileImageUrl}
+                    alt="user-image"
+                    className="rounded-full"
+                    height={50}
+                    width={50}
+                  />
+                )}
               </div>
               <div className="col-span-10 w-full ">
                 <textarea
@@ -86,14 +83,25 @@ export default function Home(props:HomeProps) {
                   rows={3}
                   id=""
                 ></textarea>
-                {url&&<Image src={url} className=" rounded-sm min-h-0 max-h-60  max-w-60"  alt="" />}
+                {url && (
+                  <div className="relative ">
+                    <Image
+                      src={url}
+                      alt="Uploaded image"
+                      unoptimized
+                      width={1}
+                      height={1}
+                      className="w-auto h-auto max-w-60 max-h-60 rounded-sm"
+                    />
+                  </div>
+                )}
                 <div className="mt-2 flex gap-6 items-center ">
                   <div className="text-center mt-4">
-      <IoImageOutline
-        onClick={handleUploadImage}
-        className="text-xl hover:text-sky-500 cursor-pointer"
-      />
-    </div>
+                    <IoImageOutline
+                      onClick={handleUploadImage}
+                      className="text-xl hover:text-sky-500 cursor-pointer"
+                    />
+                  </div>
                   <button
                     onClick={handleCreateTweet}
                     className="rounded-full bg-white  text-black text-lg py-1.5 px-4 hover:bg-zinc-200 cursor-pointer "
@@ -104,8 +112,8 @@ export default function Home(props:HomeProps) {
               </div>
             </div>
           </div>
-          {tweets?.map((tweet) =>
-            tweet ? <FeedCard key={tweet.id} data={tweet as Tweet} /> : null
+          {(tweets as Tweet[]).map((tweet: Tweet) =>
+            tweet ? <FeedCard key={tweet.id} data={tweet} /> : null
           )}
         </div>
       </TweeterLayout>
@@ -113,11 +121,13 @@ export default function Home(props:HomeProps) {
   );
 }
 
-export const getServerSideProps:GetServerSideProps=async()=>{
-  const getAllTweets = await graphqlClient.request(getAllTweetQuery)
-  return {props:{
-    tweets:getAllTweets.getAllTweets as Tweet,
-  }}
-}
-
-
+export const getServerSideProps: GetServerSideProps = async () => {
+  const getAllTweets = await graphqlClient.request<GetAllTweetsQuery>(
+    getAllTweetQuery
+  );
+  return {
+    props: {
+      tweets: getAllTweets.getAllTweets,
+    },
+  };
+};
